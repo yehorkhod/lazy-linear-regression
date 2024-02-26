@@ -1,2 +1,3 @@
-from .lap_reg.LazyPolynomialRegression import LazyPolynomialRegression
-from .lap_reg.PowerDecider import PowerDecider
+from .LazyPolynomialRegression import LazyPolynomialRegression
+from .PowerDecider import PowerDecider
+from .PolynomialColumnsAdder import PolynomialColumnsAdder

@@ -1,8 +1,8 @@
 import numpy as np
-from .lap_reg.alreadyInitialized import alreadyInitialized
-from .lap_reg.Model import Model
-from .lap_reg.PowerDecider import PowerDecider
-from .lap_reg.PolynomialColumnsAdder import PolynomialColumnsAdder
+from .alreadyInitialized import alreadyInitialized
+from .Model import Model
+from .PowerDecider import PowerDecider
+from .PolynomialColumnsAdder import PolynomialColumnsAdder
 
 
 class LazyPolynomialRegression:
@@ -11,9 +11,11 @@ class LazyPolynomialRegression:
     __model: Model = None
     __polynomial_column_adder: PolynomialColumnsAdder = None
 
+
     def __init__(self, alpha: int, divisions: int, power_decider_parameter: str, model: Model) -> None:
         self.__power_decider = PowerDecider(alpha, divisions, power_decider_parameter)
         self.model = model
+
 
     def fit(self, X: np.ndarray, y: np.ndarray, *args, **kwargs) -> np.ndarray:
         powers = self.__power_decider.fit(X, y)
@@ -29,9 +31,11 @@ class LazyPolynomialRegression:
 
         return predictions
 
+
     @property
     def power_decider(self):
         return self.__power_decider
+
 
     @property
     def model(self):
@@ -42,9 +46,10 @@ class LazyPolynomialRegression:
         alreadyInitialized(self.__model, 'model')
 
         if not isinstance(model, Model):
-            raise Exception('Wrong "model" value, must contain "fit" and "predict" methods.')
+            raise Exception('Wrong "model" value, passed model must contain "fit" and "predict" methods.')
 
         self.__model = model
+
 
     @property
     def polynomial_column_adder(self):

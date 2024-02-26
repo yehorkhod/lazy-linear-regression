@@ -1,5 +1,5 @@
 import numpy as np
-from .lap_reg.alreadyInitialized import alreadyInitialized
+from .alreadyInitialized import alreadyInitialized
 
 
 class PowerDecider:
@@ -14,11 +14,13 @@ class PowerDecider:
     __indexes_hash: dict[int, np.ndarray] = None
     __powers: np.ndarray = None
 
+
     def __init__(self, alpha: int, divisions: int, power_decider_parameter: str) -> None:
         self.alpha = alpha
         self.divisions = divisions
         self.__n_bins = 2 ** divisions
         self.power_decider_parameter = power_decider_parameter
+
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         data = np.concatenate([X, y.reshape(-1, 1)], axis=1)
@@ -30,6 +32,7 @@ class PowerDecider:
         self.__powerTest(data)
 
         return self.__powers.astype(int)
+ 
 
     def __powerTest(self, data: np.ndarray) -> None:
         for column in range(self.__n_columns):
@@ -79,6 +82,23 @@ class PowerDecider:
         if self.__power_decider_parameter == 'maximum':
             return int(np.max(powers))
 
+    def __binsBoundariesSetter(self) -> None:
+        self.__bins_boundaries = np.zeros([self.__n_columns, self.__n_bins + 1, 2])
+
+        for column, [minimum, maximum] in enumerate(self.__columns_boundaries):
+            for bin_ in range(self.__n_bins):
+                left_limit = ((self.__n_bins - bin_) * minimum + bin_ * maximum) / self.__n_bins
+                right_limit = ((self.__n_bins - bin_ - 1) * minimum + (bin_ + 1) * maximum) / self.__n_bins
+
+                self.__bins_boundaries[column][bin_][0] = left_limit
+                self.__bins_boundaries[column][bin_][1] = right_limit
+
+    def __indexesHashSetter(self) -> None:
+        columns = np.arange(0, self.__n_columns)
+        columns_twice = np.concatenate([columns, columns])
+        self.__indexes_hash = {i: columns_twice[1 + i:1 + self.__n_columns + i] for i in range(self.__n_columns)}
+
+
     @staticmethod
     def upDownDecider(column_bins: np.ndarray, column: int) -> list:
         up_down = []
@@ -116,21 +136,6 @@ class PowerDecider:
 
         return power
 
-    def __binsBoundariesSetter(self) -> None:
-        self.__bins_boundaries = np.zeros([self.__n_columns, self.__n_bins + 1, 2])
-
-        for column, [minimum, maximum] in enumerate(self.__columns_boundaries):
-            for bin_ in range(self.__n_bins):
-                left_limit = ((self.__n_bins - bin_) * minimum + bin_ * maximum) / self.__n_bins
-                right_limit = ((self.__n_bins - bin_ - 1) * minimum + (bin_ + 1) * maximum) / self.__n_bins
-
-                self.__bins_boundaries[column][bin_][0] = left_limit
-                self.__bins_boundaries[column][bin_][1] = right_limit
-
-    def __indexesHashSetter(self) -> None:
-        columns = np.arange(0, self.__n_columns)
-        columns_twice = np.concatenate([columns, columns])
-        self.__indexes_hash = {i: columns_twice[1 + i:1 + self.__n_columns + i] for i in range(self.__n_columns)}
 
     @property
     def alpha(self):
@@ -145,6 +150,7 @@ class PowerDecider:
 
         self.__alpha = alpha
 
+
     @property
     def divisions(self):
         return self.__divisions
@@ -158,9 +164,6 @@ class PowerDecider:
 
         self.__divisions = divisions
 
-    @property
-    def n_bins(self):
-        return self.__n_bins
 
     @property
     def power_decider_parameter(self):

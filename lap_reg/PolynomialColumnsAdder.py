@@ -1,13 +1,15 @@
 import numpy as np
-from .lap_reg.alreadyInitialized import alreadyInitialized
+from .alreadyInitialized import alreadyInitialized
 
 
 class PolynomialColumnsAdder:
 
     __powers: np.ndarray = None
 
+
     def __init__(self, powers: np.ndarray) -> None:
         self.powers = powers
+
 
     def transform(self, X: np.ndarray) -> np.ndarray:
         n_rows, n_columns = X.shape
@@ -21,9 +23,11 @@ class PolynomialColumnsAdder:
 
         return X_preprocessed
 
+
     def __equalityCheck(self, n_columns) -> None:
         if not (n_columns == len(self.__powers)):
             raise Exception('Number of X\'s columns and number of powers in an array do not match.')
+
 
     @property
     def powers(self):
